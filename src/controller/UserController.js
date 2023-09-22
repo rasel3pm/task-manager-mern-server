@@ -15,13 +15,9 @@ exports.register = async (req, res) => {
     reqBody.password = hash;
     // Create the user with the hashed password
     let data = await UserModel.create(reqBody);
-    res
-      .status(200)
-      .json({ message: "Account created successfully", data: data });
+    res.status(200).json({ status: "success", data: data });
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Something went wrong", error: error.message });
+    res.status(200).json({ status: "fail", data: error });
   }
 };
 
@@ -40,7 +36,9 @@ exports.login = async (req, res) => {
           process.env.JWT_SECRET,
           { expiresIn: "1h" }
         );
-        res.status(200).json({ message: "Login Success", token: token,user:user });
+        res
+          .status(200)
+          .json({ message: "Login Success", token: token, user: user });
       } else {
         res.status(401).json({ message: "wrong email or password" });
       }
@@ -52,22 +50,26 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.ProfileUpdate= async(req,res)=>{
+exports.ProfileUpdate = async (req, res) => {
   try {
-    let email = req.headers['email']
-    let reqBody = req.body 
-    let updatedData= await UserModel.updateOne({email:email},{$set:reqBody} ,{upsert:true})
-      if(updatedData){
-        res.status(200).json({status:"Save Changes"})
-      }else{
-        res.status(200).json({status:"fail",})
-      }
+    let email = req.headers["email"];
+    let reqBody = req.body;
+    let updatedData = await UserModel.updateOne(
+      { email: email },
+      { $set: reqBody },
+      { upsert: true }
+    );
+    if (updatedData) {
+      res.status(200).json({ status: "Save Changes" });
+    } else {
+      res.status(200).json({ status: "fail" });
+    }
   } catch (error) {
-    res.status(200).json({status:"fail",message:"Something went wrong"})
+    res.status(200).json({ status: "fail", message: "Something went wrong" });
   }
-}
+};
 
-exports.GetProfile=async(req,res)=>{
-  let data = await UserModel.find()
-  res.json(data)
-}
+exports.GetProfile = async (req, res) => {
+  let data = await UserModel.find();
+  res.json(data);
+};
