@@ -42,5 +42,8 @@ app.use(limiter);
 //Database
 // Managing BackEnd API Routing
 app.use("/api/v1", router);
+app.get("*", function (res, res) {
+  res.status(404).json({ message: "Page Not Found" });
+});
 
 module.exports = app;
