@@ -9,7 +9,7 @@ const {
   register,
   login,
   ProfileUpdate,
-  GetProfile,
+  GetProfileDetails,
 } = require("../controller/UserController");
 const AuthVerification = require("../middleware/AuthVerification");
 
@@ -18,7 +18,7 @@ const router = require("express").Router();
 router.post("/registration", register);
 router.post("/login", login);
 router.post("/ProfileUpdate", AuthVerification, ProfileUpdate);
-router.get("/GetProfile", AuthVerification, GetProfile);
+router.get("/GetProfileDetails", AuthVerification, GetProfileDetails);
 
 router.post("/CreateTask", AuthVerification, CreateTask);
 router.get("/DeleteTask/:id", AuthVerification, DeleteTask);

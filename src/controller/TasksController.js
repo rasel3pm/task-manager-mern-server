@@ -30,13 +30,14 @@ exports.DeleteTask = async (req, res) => {
 exports.UpdateTask = async (req, res) => {
   try {
     let status = req.params.status;
-    reqBody.email = req.headers["email"];
+    let id = req.params.id;
     let reqBody = { status: status };
-    let data = await TaskModel.findByIdAndUpdate({ _id: taskId }, reqBody, {
+    reqBody.email = req.headers["email"];
+    let data = await TaskModel.findByIdAndUpdate({ _id: id }, reqBody, {
       new: true,
     });
     await data.save();
-    res.status(200).json({ message: "Success update task", data });
+    res.status(200).json({ message: "Success update task", data: data });
   } catch (err) {
     res.status(200).json({ status: "faild", err });
   }
