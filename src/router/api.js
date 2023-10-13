@@ -4,6 +4,7 @@ const {
   UpdateTask,
   ListTaskByStatus,
   TaskStatusCount,
+  SearchByKeyword,
 } = require("../controller/TasksController");
 const {
   register,
@@ -26,4 +27,5 @@ router.get("/UpdateTask/:id/:status", AuthVerification, UpdateTask);
 router.get("/ListTaskByStatus/:status", AuthVerification, ListTaskByStatus);
 router.get("/TaskStatusCount", AuthVerification, TaskStatusCount);
 
+router.get("/SearchTask/:keyword", SearchByKeyword);
 module.exports = router;

@@ -82,3 +82,20 @@ exports.TaskStatusCount = async (req, res) => {
     res.status(200).json({ status: "faild", err });
   }
 };
+
+exports.SearchByKeyword = async (req, res) => {
+  try {
+    let SearchRgx = { $regex: req.params.keyword, $options: "i" };
+    let SearchQuery = {
+      $or: [{ title: SearchRgx }, { description: SearchRgx }],
+    };
+    let matchStage = { $match: SearchQuery };
+    // let projection = { $project: { _id: 0 } };
+
+    let data = await TaskModel.aggregate([matchStage]);
+
+    res.status(200).json({ status: true, data: data });
+  } catch (e) {
+    res.status(200).json({ status: false, e });
+  }
+};
