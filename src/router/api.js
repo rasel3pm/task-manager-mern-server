@@ -27,5 +27,5 @@ router.get("/UpdateTask/:id/:status", AuthVerification, UpdateTask);
 router.get("/ListTaskByStatus/:status", AuthVerification, ListTaskByStatus);
 router.get("/TaskStatusCount", AuthVerification, TaskStatusCount);
 
-router.get("/SearchTask/:keyword", SearchByKeyword);
+router.get("/SearchTask/:keyword", AuthVerification, SearchByKeyword);
 module.exports = router;

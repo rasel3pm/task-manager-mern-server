@@ -85,17 +85,42 @@ exports.TaskStatusCount = async (req, res) => {
 
 exports.SearchByKeyword = async (req, res) => {
   try {
+    let email = req.headers.email;
+    console.log(email);
     let SearchRgx = { $regex: req.params.keyword, $options: "i" };
     let SearchQuery = {
       $or: [{ title: SearchRgx }, { description: SearchRgx }],
     };
     let matchStage = { $match: SearchQuery };
+    let authMatchStage = { $match: { email: email } };
+    console.log(authMatchStage);
     // let projection = { $project: { _id: 0 } };
 
-    let data = await TaskModel.aggregate([matchStage]);
+    let data = await TaskModel.aggregate([authMatchStage, matchStage]);
 
     res.status(200).json({ status: true, data: data });
   } catch (e) {
     res.status(200).json({ status: false, e });
   }
 };
+
+// exports.SearchByKeyword = async (req, res) => {
+//   try {
+//     const email = req.headers["email"];
+//     const searchRgx = new RegExp(req.params.keyword, "i");
+//     const searchQuery = {
+//       $or: [
+//         { title: { $regex: searchRgx } },
+//         { description: { $regex: searchRgx } },
+//       ],
+//     };
+//     const matchStage = { $match: searchQuery };
+//     const authMatchStage = { $match: { email: email } };
+
+//     const data = await TaskModel.aggregate([authMatchStage, matchStage]);
+
+//     res.status(200).json({ status: true, data: data });
+//   } catch (error) {
+//     res.status(500).json({ status: false, error: error.message });
+//   }
+// };
