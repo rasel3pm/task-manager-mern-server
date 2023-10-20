@@ -30,5 +30,5 @@ router.get("/TaskStatusCount", AuthVerification, TaskStatusCount);
 
 router.get("/SearchTask/:keyword", AuthVerification, SearchByKeyword);
 
-router.get("/MatchProfile", MatchProfile);
+router.post("/MatchProfile", MatchProfile);
 module.exports = router;
