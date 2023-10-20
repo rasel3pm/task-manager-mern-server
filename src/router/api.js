@@ -11,6 +11,7 @@ const {
   login,
   ProfileUpdate,
   GetProfileDetails,
+  MatchProfile,
 } = require("../controller/UserController");
 const AuthVerification = require("../middleware/AuthVerification");
 
@@ -28,4 +29,6 @@ router.get("/ListTaskByStatus/:status", AuthVerification, ListTaskByStatus);
 router.get("/TaskStatusCount", AuthVerification, TaskStatusCount);
 
 router.get("/SearchTask/:keyword", AuthVerification, SearchByKeyword);
+
+router.get("/MatchProfile", MatchProfile);
 module.exports = router;

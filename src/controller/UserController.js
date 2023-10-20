@@ -1,6 +1,7 @@
 const UserModel = require("../model/UserModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const SendEmailUtility = require("../utility/SendMail");
 exports.register = async (req, res) => {
   try {
     let reqBody = req.body;
@@ -89,5 +90,25 @@ exports.GetProfileDetails = async (req, res) => {
     res.status(200).json({ status: "Success", data: data });
   } catch (e) {
     res.status(200).json({ status: "Fail", error: e });
+  }
+};
+
+exports.MatchProfile = async (req, res) => {
+  try {
+    let email = req.body.email;
+    let data = await UserModel.aggregate([{ $match: { email: email } }]);
+    let code = Math.floor(1000 + Math.random() * 9000);
+    let emailText = `Your verification code is ${code}`;
+
+    if (data.length > 0) {
+      await SendEmailUtility(email, emailText, "Email Verification");
+      res
+        .status(200)
+        .json({ status: "Success", message: "6 Digit OTP Verify send" });
+    } else {
+      res.status(404).json({ status: "Fail", error: "User not found" });
+    }
+  } catch (e) {
+    res.status(500).json({ status: false, message: "Something Went wrong" });
   }
 };
