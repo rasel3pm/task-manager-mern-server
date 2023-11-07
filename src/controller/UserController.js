@@ -2,6 +2,7 @@ const UserModel = require("../model/UserModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const SendEmailUtility = require("../utility/SendMail");
+const OTPModel = require("../model/OtpModel");
 exports.register = async (req, res) => {
   try {
     let reqBody = req.body;
@@ -95,20 +96,80 @@ exports.GetProfileDetails = async (req, res) => {
 
 exports.MatchProfile = async (req, res) => {
   try {
-    let email = req.body.email;
+    let email = req.params.email;
     let code = Math.floor(1000 + Math.random() * 9000);
     let emailText = `Your verification code is ${code}`;
-
-    await SendEmailUtility(email, emailText, "Email Verification");
-    await UserModel.updateOne(
-      { email: email },
-      { $set: { otp: code } },
-      { upsert: true }
-    );
-    res
-      .status(200)
-      .json({ status: "Success", message: "6 Digit OTP Verify send" });
+    let countUser = await UserModel.aggregate([
+      { $match: { email: email } },
+      { $count: "total" },
+    ]);
+    if (countUser.length > 0) {
+      let OPTCreate = await OTPModel.create({ email: email, otp: code });
+      let sendMail = await SendEmailUtility(
+        email,
+        emailText,
+        "Email Verification code is" + code
+      );
+      res.status(200).json({
+        status: "success",
+        message: "4 Digit OTP Verify send",
+        data: sendMail,
+      });
+    } else {
+      res.status(200).json({ status: false, message: "User Not found" });
+    }
   } catch (e) {
+    res.status(500).json({ status: false, message: "Something Went wrong" });
+  }
+};
+
+exports.VerifyOTPCode = async (req, res) => {
+  try {
+    let email = req.params.email;
+    let OTP = req.params.otp;
+    let status = 0;
+    let updateStatus = 1;
+    let countOTP = await OTPModel.aggregate([
+      { $match: { email: email, otp: OTP, status: status } },
+      { $count: "total" },
+    ]);
+    if (countOTP.length > 0) {
+      let updateOTP = await OTPModel.updateOne(
+        { email: email, otp: OTP, status: status },
+        { email: email, otp: OTP, status: updateStatus }
+      );
+      res.status(200).json({ status: "success", data: updateOTP });
+    } else {
+      res.status(200).json({ status: "fail", data: "Invalid OTP Code" });
+    }
+  } catch (error) {
+    res.status(500).json({ status: false, message: "Something Went wrong" });
+  }
+};
+exports.ResetPassword = async (req, res) => {
+  try {
+    let email = req.body["email"];
+    let OTPCode = req.body["OTP"];
+    let NewPass = req.body["password"];
+    let statusUpdate = 1;
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(NewPass, salt);
+    let OTPUsedCount = await OTPModel.aggregate([
+      { $match: { email: email, otp: OTPCode, status: statusUpdate } },
+      { $count: "total" },
+    ]);
+    if (OTPUsedCount.length > 0) {
+      let PassUpdate = await UserModel.updateOne(
+        { email: email },
+        {
+          password: hash,
+        }
+      );
+      res.status(200).json({ status: "success", data: PassUpdate });
+    } else {
+      res.status(200).json({ status: "fail", data: "Invalid Request" });
+    }
+  } catch (error) {
     res.status(500).json({ status: false, message: "Something Went wrong" });
   }
 };

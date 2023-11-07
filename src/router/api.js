@@ -12,6 +12,8 @@ const {
   ProfileUpdate,
   GetProfileDetails,
   MatchProfile,
+  VerifyOTPCode,
+  ResetPassword,
 } = require("../controller/UserController");
 const AuthVerification = require("../middleware/AuthVerification");
 
@@ -30,5 +32,7 @@ router.get("/TaskStatusCount", AuthVerification, TaskStatusCount);
 
 router.get("/SearchTask/:keyword", AuthVerification, SearchByKeyword);
 
-router.post("/MatchProfile", MatchProfile);
+router.get("/MatchProfile/:email", MatchProfile);
+router.get("/VerifyOTPCode/:email/:otp", VerifyOTPCode);
+router.post("/ResetPassword", ResetPassword);
 module.exports = router;
